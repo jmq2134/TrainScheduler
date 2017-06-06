@@ -1,0 +1,21 @@
+.row {
+	padding: 10px;
+}
+
+.jumbotron {
+	background-color: #4B0082;
+}
+
+.jumbotron .h1, .jumbotron h1 {
+	color: white;
+}
+
+thead {
+	background-color: #f5f5f5;
+}
+
+.panel-default>.panel-heading {
+	font-style: bold;
+	color: #4B0082;
+	font-weight: bold;
+}

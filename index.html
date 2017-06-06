@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Sign-Up Today!</title>
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <br>
+        <!-- Jumbotron -->
+        <div class="jumbotron">
+            <h1 class="text-center">Anytime is Train Time!</h1>
+        </div>
+        <!-- Train Schedule Panel -->
+        <div class="row">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Train Name</th>
+                        <th>Destination</th>
+                        <th>Frequency (min)</th>
+                        <th>Next Arrival</th>
+                        <th>Minutes Away</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">1</th>
+                        <td>Mark</td>
+                        <td>Otto</td>
+                        <td>@mdo</td>
+                        <td>@mdo</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">2</th>
+                        <td>Jacob</td>
+                        <td>Thornton</td>
+                        <td>@fat</td>
+                        <td>@mdo</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">3</th>
+                        <td>Larry</td>
+                        <td>the Bird</td>
+                        <td>@twitter</td>
+                        <td>@mdo</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- Add a train Panel-->
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Add a new train!</h3>
+                </div>
+                <div class="panel-body">
+                    <form role="form">
+                        <div class="form-group">
+                            <label for="name-input">Train Name:</label>
+                            <input class="form-control" id="name-input" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="destination-input">Destination:</label>
+                            <input class="form-control" id="destination-input" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="time-input">First train time (HH:mm - military time):</label>
+                            <input class="form-control" id="time-input" type="time">
+                        </div>
+                        <div class="form-group">
+                            <label for="frequency-input">Frequency (min):</label>
+                            <input class="form-control" id="frequency-input" type="number">
+                        </div>
+                        <button class="btn btn-default" id="add-train" type="submit">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <!-- LINK TO FIREBASE  -->
+    <script src="https://www.gstatic.com/firebasejs/4.1.1/firebase.js"></script>
+    <!-- Script -->
+    <script>
+    // Initialize Firebase
+    var config = {
+        apiKey: "AIzaSyBEY7QiASVjV2BPasl57xoX97oNlJO3dCQ",
+        authDomain: "trainscheduler-409fb.firebaseapp.com",
+        databaseURL: "https://trainscheduler-409fb.firebaseio.com",
+        projectId: "trainscheduler-409fb",
+        storageBucket: "trainscheduler-409fb.appspot.com",
+        messagingSenderId: "416557900034"
+    };
+
+    firebase.initializeApp(config);
+
+    // Create a variable to reference the database
+    var database = firebase.database();
+
+    // Initial train variables
+    var name = "";
+    var destination = "";
+    var time = 0;
+    var frequency = 0;
+
+    /// SUBMIT NEW TRAIN FUNCTION
+    $("#add-train").on("click", function() {
+        // Don't refresh the page!
+        event.preventDefault();
+
+        // Retrieves the new train info from the form
+        var name = $("#name-input").val().trim();
+        var destination = $("#destination-input").val().trim();
+        var time = $("#time-input").val().trim();
+        var frequency = $("#frequency-input").val().trim();
+
+        // Code for handling the push to Firebase
+        database.ref().push({
+            trainName: name,
+            trainDestination: destination,
+            trainTime: time,
+            trainFrequency: frequency
+        });
+
+    }); // Close new train function
+
+    /// FIREBASE WATCHER FUNCTION
+    database.ref().on("value", function(snapshot) {
+
+            // "Snapshot" variable gets the most current values in firebase.
+            var sv = snapshot.val();
+            console.log(snapshot.val());
+
+            // Getting an array of each key In the snapshot object
+            var svArr = Object.keys(sv);
+            console.log(svArr);
+
+            // Console Log the train info variables
+            // console.log(trainName);
+            // console.log(trainDestination);
+            // console.log(trainTime);
+            // console.log(trainFrequency);
+
+            // Call the print train table function
+
+        },
+
+        // Firebase error logging
+        function(errorObject) {
+            console.log("The read failed: " + errorObject.code);
+
+        }); // Close firebase watcher function
+
+    /// PRINT TRAIN TABLE
+
+    
+    </script>
+</body>
+
+</html>
