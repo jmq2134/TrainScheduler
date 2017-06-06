@@ -6,7 +6,9 @@
     <title>Sign-Up Today!</title>
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <!-- Bootswatch Cosmos -->
     <link rel="stylesheet" type="text/css" href="bootswatch.css">
+    <!-- CSS -->
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 
@@ -16,6 +18,8 @@
         <!-- Jumbotron -->
         <div class="jumbotron">
             <h1 class="text-center">Anytime is Train Time!</h1>
+            <br>
+            <h2 class="current-time">Current time: </h2>
         </div>
         <!-- Train Schedule Panel -->
         <div class="row">
@@ -30,7 +34,6 @@
                     </tr>
                 </thead>
                 <tbody id="trainBody">
-
                 </tbody>
             </table>
         </div>
@@ -67,6 +70,8 @@
     </div>
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery.js"></script>
+    <!-- moment.js -->
+    <script src="moment.js"></script>
     <!-- LINK TO FIREBASE  -->
     <script src="https://www.gstatic.com/firebasejs/4.1.1/firebase.js"></script>
     <!-- Script -->
@@ -94,7 +99,12 @@
     var trainArray = [];
 
     // Current time variale
-    var currentTime = 0;
+    var currentTime = moment().format('LT');
+    console.log(currentTime);
+    $(".current-time").html("<h2> Current time: " + currentTime + "</h2>");
+
+
+
 
     /// SUBMIT NEW TRAIN FUNCTION
     $("#add-train").on("click", function() {
@@ -121,6 +131,12 @@
         $("#time-input").val("");
         $("#frequency-input").val("");
 
+        // Clear train table
+        $("#trainBody").html("");
+
+        // Reprint train table
+        printTable();
+
     }); // Close new train function
 
     /// FIREBASE WATCHER FUNCTION
@@ -134,12 +150,18 @@
             var svArr = Object.keys(sv);
             console.log(svArr);
 
+            // Clear train array
+            trainArray = [];
+
             // For loop to print out key array and push to trainArray
             for (var key in sv) {
                 var thisObject = sv[key];
                 trainArray.push(thisObject);
                 console.log(trainArray);
             }
+
+            // Clear train table
+            $("#trainBody").html("");
 
             // Call the print train table function
             printTable();
@@ -163,22 +185,29 @@
             console.log(trainArray[i].trainTime);
             console.log(trainArray[i].trainFrequency);
 
-            $("#trainBody").append("<tr><td>" + trainArray[i].trainName + "</td><td>" + trainArray[i].trainDestination + "</td><td>" + trainArray[i].trainFrequency + "</td><td>" + trainArray[i].trainTime + "</td></tr>")
+            // Find next trainArrival by adding trainTime + trainFrequency
+            var trainArrival = trainArray[i].trainTime + trainArray[i].trainFrequency;
+            console.log(trainArrival);
+
+
+
+            // Append trainArray to table
+            $("#trainBody").append("<tr><td>" + trainArray[i].trainName + "</td><td>" + trainArray[i].trainDestination + "</td><td>" + trainArray[i].trainFrequency + "</td><td>" + trainArray[i].trainTime + "</td><td>" + 0 + "</td></tr>");
 
 
         } // Close print table function
 
     }
 
-        /// CLEAR TRAIN DATA
-        $("#del-trains").on("click", function() {
-            database.ref().set({
-                trainName: null,
-                trainDestination: null,
-                trainTime: null,
-                trainFrequency: null
-            })
-        }); // Close clear train data function
+    /// CLEAR TRAIN DATA FROM DATABASE FUNCTION
+    $("#del-trains").on("click", function() {
+        database.ref().set({
+            trainName: null,
+            trainDestination: null,
+            trainTime: null,
+            trainFrequency: null
+        })
+    }); // Close clear train data function
     </script>
 </body>
 
