@@ -101,10 +101,9 @@
     // Current time variale
     var currentTime = moment().format('LT');
     console.log(currentTime);
+
+    // Append current time to jumbotron for user's reference
     $(".current-time").html("<h2> Current time: " + currentTime + "</h2>");
-
-
-
 
     /// SUBMIT NEW TRAIN FUNCTION
     $("#add-train").on("click", function() {
@@ -185,14 +184,33 @@
             console.log(trainArray[i].trainTime);
             console.log(trainArray[i].trainFrequency);
 
-            // Find next trainArrival by adding trainTime + trainFrequency
-            var trainArrival = trainArray[i].trainTime + trainArray[i].trainFrequency;
-            console.log(trainArrival);
+            // Convert the entered train time
+            firstTrain = moment(trainArray[i].trainTime, "hh:mm").subtract(1, "years");
 
+            // Use moment.js to find the difference between the firstTrain and current time
+            timeDifference = moment().diff(moment(firstTrain), "minutes");
 
+            // Remaining time is the remainder of the timeDifference / frequency
+            tRemainder = timeDifference % trainArray[i].trainFrequency;
+
+            // Minutes until the next train is the frequency - train remainder
+            minsNextTrain = trainArray[i].trainFrequency - tRemainder;
+
+            // The next time arrives in variable
+            nextTrain = moment().add(trainArray[i].trainFrequency, "minutes");
+
+            // Format next train to hh:mm
+            nextTrainFormatted = moment(nextTrain).format("hh:mm");
+
+            console.log(firstTrain);
+            console.log(timeDifference);
+            console.log(tRemainder);
+            console.log(minsNextTrain);
+            console.log(nextTrain);
+            console.log(nextTrainFormatted);
 
             // Append trainArray to table
-            $("#trainBody").append("<tr><td>" + trainArray[i].trainName + "</td><td>" + trainArray[i].trainDestination + "</td><td>" + trainArray[i].trainFrequency + "</td><td>" + trainArray[i].trainTime + "</td><td>" + 0 + "</td></tr>");
+            $("#trainBody").append("<tr><td>" + trainArray[i].trainName + "</td><td>" + trainArray[i].trainDestination + "</td><td>" + trainArray[i].trainFrequency + "</td><td>" + nextTrainFormatted + "</td><td>" + minsNextTrain + "</td></tr>");
 
 
         } // Close print table function
