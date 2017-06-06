@@ -6,6 +6,7 @@
     <title>Sign-Up Today!</title>
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="bootswatch.css">
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 
@@ -18,7 +19,7 @@
         </div>
         <!-- Train Schedule Panel -->
         <div class="row">
-            <table class="table">
+            <table class="table" id="trainTable">
                 <thead>
                     <tr>
                         <th>Train Name</th>
@@ -28,28 +29,8 @@
                         <th>Minutes Away</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <th scope="row">1</th>
-                        <td>Mark</td>
-                        <td>Otto</td>
-                        <td>@mdo</td>
-                        <td>@mdo</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">2</th>
-                        <td>Jacob</td>
-                        <td>Thornton</td>
-                        <td>@fat</td>
-                        <td>@mdo</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">3</th>
-                        <td>Larry</td>
-                        <td>the Bird</td>
-                        <td>@twitter</td>
-                        <td>@mdo</td>
-                    </tr>
+                <tbody id="trainBody">
+
                 </tbody>
             </table>
         </div>
@@ -78,6 +59,7 @@
                             <input class="form-control" id="frequency-input" type="number">
                         </div>
                         <button class="btn btn-default" id="add-train" type="submit">Submit</button>
+                        <button class="btn btn-warning" id="del-trains" type="submit">Clear All Train Data</button>
                     </form>
                 </div>
             </div>
@@ -109,6 +91,10 @@
     var destination = "";
     var time = 0;
     var frequency = 0;
+    var trainArray = [];
+
+    // Current time variale
+    var currentTime = 0;
 
     /// SUBMIT NEW TRAIN FUNCTION
     $("#add-train").on("click", function() {
@@ -129,6 +115,12 @@
             trainFrequency: frequency
         });
 
+        // Clear input forms
+        $("#name-input").val("");
+        $("#destination-input").val("");
+        $("#time-input").val("");
+        $("#frequency-input").val("");
+
     }); // Close new train function
 
     /// FIREBASE WATCHER FUNCTION
@@ -142,13 +134,15 @@
             var svArr = Object.keys(sv);
             console.log(svArr);
 
-            // Console Log the train info variables
-            // console.log(trainName);
-            // console.log(trainDestination);
-            // console.log(trainTime);
-            // console.log(trainFrequency);
+            // For loop to print out key array and push to trainArray
+            for (var key in sv) {
+                var thisObject = sv[key];
+                trainArray.push(thisObject);
+                console.log(trainArray);
+            }
 
             // Call the print train table function
+            printTable();
 
         },
 
@@ -159,8 +153,32 @@
         }); // Close firebase watcher function
 
     /// PRINT TRAIN TABLE
+    function printTable() {
 
-    
+        // For loop to print trainArray into train table
+
+        for (i = 0; i < trainArray.length; i++) {
+            console.log(trainArray[i].trainName);
+            console.log(trainArray[i].trainDestination);
+            console.log(trainArray[i].trainTime);
+            console.log(trainArray[i].trainFrequency);
+
+            $("#trainBody").append("<tr><td>" + trainArray[i].trainName + "</td><td>" + trainArray[i].trainDestination + "</td><td>" + trainArray[i].trainFrequency + "</td><td>" + trainArray[i].trainTime + "</td></tr>")
+
+
+        } // Close print table function
+
+    }
+
+        /// CLEAR TRAIN DATA
+        $("#del-trains").on("click", function() {
+            database.ref().set({
+                trainName: null,
+                trainDestination: null,
+                trainTime: null,
+                trainFrequency: null
+            })
+        }); // Close clear train data function
     </script>
 </body>
 
