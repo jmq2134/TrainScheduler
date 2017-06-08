@@ -40,8 +40,8 @@
         <!-- Add a train Panel-->
         <div class="row">
             <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Add a new train!</h3>
+                <div class="panel-heading" id="newTrainHeader">
+                    <h3 class="panel-title" id="newTrainTitle" >Add a new train!</h3>
                 </div>
                 <div class="panel-body">
                     <form role="form">
@@ -55,7 +55,7 @@
                         </div>
                         <div class="form-group">
                             <label for="time-input">First train time (HH:mm - military time):</label>
-                            <input class="form-control" id="time-input" type="time">
+                            <input class="form-control" id="time-input" type="text">
                         </div>
                         <div class="form-group">
                             <label for="frequency-input">Frequency (min):</label>
@@ -98,12 +98,32 @@
     var frequency = 0;
     var trainArray = [];
 
-    // Current time variale
-    var currentTime = moment().format('LT');
-    console.log(currentTime);
+    $(document).ready(function() {
+        // Update the time and reprint the train table every minute
+        updateTime();
+        setInterval(function() {
+            updateTime();
+        }, 60000);
+    })
 
-    // Append current time to jumbotron for user's reference
-    $(".current-time").html("<h2> Current time: " + currentTime + "</h2>");
+
+    /// UPDATE TIME FUNCTION
+    function updateTime() {
+        // Current time variale
+        var currentTime = moment().format('LT');
+        console.log(currentTime);
+
+        // Append current time to jumbotron for user's reference
+        $(".current-time").html("<h2> Current time: " + currentTime + "</h2>");
+
+        // Clear train table
+        $("#trainBody").html("");
+
+        // Reprint table
+        printTable();
+
+    } // Close clock function
+
 
     /// SUBMIT NEW TRAIN FUNCTION
     $("#add-train").on("click", function() {
@@ -113,7 +133,7 @@
         // Retrieves the new train info from the form
         var name = $("#name-input").val().trim();
         var destination = $("#destination-input").val().trim();
-        var time = $("#time-input").val().trim();
+        var time = moment($("#time-input").val().trim(), "HH:mm").subtract(10, "years").format("X");
         var frequency = $("#frequency-input").val().trim();
 
         // Code for handling the push to Firebase
@@ -177,45 +197,28 @@
     function printTable() {
 
         // For loop to print trainArray into train table
-
         for (i = 0; i < trainArray.length; i++) {
-            console.log(trainArray[i].trainName);
-            console.log(trainArray[i].trainDestination);
-            console.log(trainArray[i].trainTime);
-            console.log(trainArray[i].trainFrequency);
 
-            // Convert the entered train time
-            firstTrain = moment(trainArray[i].trainTime, "hh:mm").subtract(1, "years");
+            // Store train array variables into new variables for ease
+            var trainName = trainArray[i].trainName;
+            var trainDestination = trainArray[i].trainDestination;
+            var trainFrequency = trainArray[i].trainFrequency;
+            var trainTime = trainArray[i].trainTime;
 
-            // Use moment.js to find the difference between the firstTrain and current time
-            timeDifference = moment().diff(moment(firstTrain), "minutes");
+            // Arrival minutes variable: Calculate the minutes until arrival by taking the current time and subtracting trainTime and find the modulus between the time difference and the trainfrequency  
+            var differenceTimes = moment().diff(moment.unix(trainTime), "minutes");
+            var trainRemainder = moment().diff(moment.unix(trainTime), "minutes") % trainFrequency;
+            var arrivalMinutes = trainFrequency - trainRemainder;
 
-            // Remaining time is the remainder of the timeDifference / frequency
-            tRemainder = timeDifference % trainArray[i].trainFrequency;
+            // Arrival time variable: Add the arrivalMinutes to the currrent time 
+            var trainArrival = moment().add(arrivalMinutes, "m").format("hh:mm A");
 
-            // Minutes until the next train is the frequency - train remainder
-            minsNextTrain = trainArray[i].trainFrequency - tRemainder;
+            // Append trainArray variables to table
+            $("#trainBody").append("<tr><td>" + trainArray[i].trainName + "</td><td>" + trainArray[i].trainDestination + "</td><td>" + trainArray[i].trainFrequency + "</td><td>" + arrivalMinutes + "</td><td>" + trainArrival + "</td></tr>");
 
-            // The next time arrives in variable
-            nextTrain = moment().add(trainArray[i].trainFrequency, "minutes");
+        } // Close train for loop
 
-            // Format next train to hh:mm
-            nextTrainFormatted = moment(nextTrain).format("hh:mm");
-
-            console.log(firstTrain);
-            console.log(timeDifference);
-            console.log(tRemainder);
-            console.log(minsNextTrain);
-            console.log(nextTrain);
-            console.log(nextTrainFormatted);
-
-            // Append trainArray to table
-            $("#trainBody").append("<tr><td>" + trainArray[i].trainName + "</td><td>" + trainArray[i].trainDestination + "</td><td>" + trainArray[i].trainFrequency + "</td><td>" + nextTrainFormatted + "</td><td>" + minsNextTrain + "</td></tr>");
-
-
-        } // Close print table function
-
-    }
+    } // Close print table function
 
     /// CLEAR TRAIN DATA FROM DATABASE FUNCTION
     $("#del-trains").on("click", function() {
