@@ -103,7 +103,7 @@
         updateTime();
         setInterval(function() {
             updateTime();
-        }, 60000);
+        }, 1000);
     })
 
 
@@ -214,7 +214,7 @@
             var trainArrival = moment().add(arrivalMinutes, "m").format("hh:mm A");
 
             // Append trainArray variables to table
-            $("#trainBody").append("<tr><td>" + trainArray[i].trainName + "</td><td>" + trainArray[i].trainDestination + "</td><td>" + trainArray[i].trainFrequency + "</td><td>" + arrivalMinutes + "</td><td>" + trainArrival + "</td></tr>");
+            $("#trainBody").append("<tr><td>" + trainArray[i].trainName + "</td><td>" + trainArray[i].trainDestination + "</td><td>" + trainArray[i].trainFrequency + "</td><td>" + trainArrival+ "</td><td>" + arrivalMinutes + "</td></tr>");
 
         } // Close train for loop
 
