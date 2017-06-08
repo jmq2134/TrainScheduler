@@ -11,6 +11,10 @@
     color: white;
 }
 
+.table th {
+    color: #001f3f;
+}
+
 .jumbotron .h1,
 .jumbotron h2 {
     color: #001f3f;
